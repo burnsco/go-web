@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 )
 
@@ -18,26 +17,13 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 func showPost(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+
 	if err != nil || id < 1 {
 		http.NotFound(w, r)
 		return
 	}
 
-	w.Write([]byte("Display a specific snippet here."))
-}
-
-func showJSON(w http.ResponseWriter, r *http.Request) {
-	jsonFile, err := os.Open("users.json")
-
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Sucessfully opened users.json")
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"name": "Corey"}`))
-
-	defer jsonFile.Close()
+	fmt.Fprintf(w, "Display a specific snippet with ID %d...", id)
 }
 
 func createPost(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +44,6 @@ func main() {
 	mux.HandleFunc("/", home)
 	mux.HandleFunc("/post", showPost)
 	mux.HandleFunc("/post/create", createPost)
-	mux.HandleFunc("/showJSON", showJSON)
 
 	log.Println("Starting server on :4002")
 	err := http.ListenAndServe(":4002", mux)
